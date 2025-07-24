@@ -17,11 +17,11 @@ def conectar():
     # ... validações ...
 
     conn = pymysql.connect(
-        host=db_host, # <--- AQUI DEVE SER A VARIÁVEL, NÃO A STRING FIXA
-        user=db_user,
-        password=db_password,
-        database=db_name,
-        port=db_port,
+        host=nozomi.proxy.rlwy.net, # <--- AQUI DEVE SER A VARIÁVEL, NÃO A STRING FIXA
+        user=root,
+        password=sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ,
+        database=railway,
+        port=39014,
         cursorclass=pymysql.cursors.DictCursor
     )
 
