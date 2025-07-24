@@ -1,43 +1,91 @@
-import pymysql
-import pymysql.cursors
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os # Mantenha o import os para a linha da porta do app.run
+import pymysql
+import pymysql.cursors
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Função para conectar ao banco de dados - AGORA COM VALORES FIXOS PARA TESTE FINAL
+# Função de conexão com o banco de dados
 def conectar():
-    # ATENÇÃO: ESTES VALORES ESTÃO HARDCODED. ISTO NÃO É A MELHOR PRÁTICA PARA SEGURANÇA.
-    # APENAS USE ISSO PARA TESTE DO TCC SE NÃO CONSEGUIR FAZER AS VARIAVEIS DE AMBIENTE FUNCIONAREM.
-    db_host = 'nozomi.proxy.rlwy.net'
+    db_host = 'nozomi.proxy.rlwy.net'  # Altere se necessário
     db_user = 'root'
     db_password = 'sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ'
     db_name = 'railway'
-    db_port = 39014 # Railway fornece a porta como número, então já é um inteiro
+    db_port = 39014
 
-    print(f"Tentando conectar COM VALORES FIXOS: Host={db_host}, User={db_user}, DB={db_name}, Port={db_port}")
+    return pymysql.connect(
+        host=db_host,
+        user=db_user,
+        password=db_password,
+        database=db_name,
+        port=db_port,
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
+# Rota para cadastrar novo TCC
+@app.route('/novo_tcc', methods=['POST'])
+def novo_tcc():
     try:
-        conn = pymysql.connect(
-            host=db_host,
-            user=db_user,
-            password=db_password,
-            database=db_name,
-            port=db_port,
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        print("Conexão com o banco de dados MySQL do Railway ESTABELECIDA COM SUCESSO usando valores fixos!")
-        return conn
-    except Exception as e:
-        print(f"Erro CRÍTICO ao conectar ao banco de dados (mesmo com valores fixos): {e}")
-        raise # Re-lança a exceção para que o Flask a capture e retorne o 500
+        dados = request.get_json()
+        titulo = dados.get('titulo')
+        autor = dados.get('autor')
+        curso = dados.get('curso')
+        ano = dados.get('ano')
+        link_arquivo = dados.get('link_arquivo')
+        id_membro_wix = dados.get('id_membro_wix')
 
-# ... (Restante do seu código API: rotas /novo_tcc, /listar_tccs, /excluir_tcc, etc.) ...
+        if not all([titulo, autor, curso, ano, link_arquivo, id_membro_wix]):
+            return jsonify({"erro": "Campos obrigatórios faltando"}), 400
+
+        conn = conectar()
+        with conn.cursor() as cursor:
+            sql = """
+                INSERT INTO tccs (titulo, autor, curso, ano, link_arquivo, id_membro_wix)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (titulo, autor, curso, ano, link_arquivo, id_membro_wix))
+            conn.commit()
+        conn.close()
+
+        return jsonify({"mensagem": "TCC cadastrado com sucesso"}), 200
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
+# Rota para listar TCCs
+@app.route('/listar_tccs', methods=['GET'])
+def listar_tccs():
+    try:
+        autor = request.args.get('autor')
+        curso = request.args.get('curso')
+        ano = request.args.get('ano')
+
+        query = "SELECT * FROM tccs WHERE 1=1"
+        valores = []
+
+        if autor:
+            query += " AND autor LIKE %s"
+            valores.append(f"%{autor}%")
+        if curso:
+            query += " AND curso = %s"
+            valores.append(curso)
+        if ano:
+            query += " AND ano = %s"
+            valores.append(ano)
+
+        conn = conectar()
+        with conn.cursor() as cursor:
+            cursor.execute(query, valores)
+            resultado = cursor.fetchall()
+        conn.close()
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
-    # O Render usa a variável de ambiente 'PORT' para definir a porta da sua aplicação
-    # É importante manter isso lendo de os.environ.get('PORT')
-    port = int(os.environ.get('PORT', 3000))
+    port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
