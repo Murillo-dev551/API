@@ -8,24 +8,20 @@ CORS(app)  # Libera acesso externo (Wix, etc.)
 
 # Conexão com banco de dados
 def conectar():
-    # Obtém as credenciais das variáveis de ambiente
-    # Esses nomes de variáveis (DB_HOST, etc.) serão os que você vai configurar no Render
-    DB_HOST = os.environ.get('DB_HOST')
-    DB_USER = os.environ.get('DB_USER')
-    DB_PASSWORD = os.environ.get('DB_PASSWORD')
-    DB_NAME = os.environ.get('DB_NAME')
-    DB_PORT = int(os.environ.get('DB_PORT', 3306)) # A porta do proxy do Railway
+    db_host = os.environ.get('DB_HOST') # <--- ISSO DEVE PERMANECER ASSIM
+    db_user = os.environ.get('DB_USER')
+    db_password = os.environ.get('DB_PASSWORD')
+    db_name = os.environ.get('DB_NAME')
+    db_port = int(os.environ.get('DB_PORT'))
 
-    # Verifica se as variáveis de ambiente estão configuradas
-    if not all([DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT]):
-        raise Exception("Variáveis de ambiente do banco de dados não configuradas corretamente! Verifique o Render.")
+    # ... validações ...
 
-    return pymysql.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        port=DB_PORT, # Adicione a porta aqui
+    conn = pymysql.connect(
+        host=db_host, # <--- AQUI DEVE SER A VARIÁVEL, NÃO A STRING FIXA
+        user=db_user,
+        password=db_password,
+        database=db_name,
+        port=db_port,
         cursorclass=pymysql.cursors.DictCursor
     )
 
