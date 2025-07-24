@@ -1,102 +1,43 @@
+import pymysql
+import pymysql.cursors
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import pymysql
-import os # Importe o módulo os para acessar variáveis de ambiente
+import os # Mantenha o import os para a linha da porta do app.run
 
 app = Flask(__name__)
-CORS(app)  # Libera acesso externo (Wix, etc.)
+CORS(app)
 
-# Conexão com banco de dados
+# Função para conectar ao banco de dados - AGORA COM VALORES FIXOS PARA TESTE FINAL
 def conectar():
-    db_host = os.environ.get('nozomi.proxy.rlwy.net') # <--- ISSO DEVE PERMANECER ASSIM
-    db_user = os.environ.get('root')
-    db_password = os.environ.get('sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ')
-    db_name = os.environ.get('railway')
-    db_port = int(os.environ.get('39014'))
+    # ATENÇÃO: ESTES VALORES ESTÃO HARDCODED. ISTO NÃO É A MELHOR PRÁTICA PARA SEGURANÇA.
+    # APENAS USE ISSO PARA TESTE DO TCC SE NÃO CONSEGUIR FAZER AS VARIAVEIS DE AMBIENTE FUNCIONAREM.
+    db_host = 'nozomi.proxy.rlwy.net'
+    db_user = 'root'
+    db_password = 'sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ'
+    db_name = 'railway'
+    db_port = 39014 # Railway fornece a porta como número, então já é um inteiro
 
-    # ... validações ...
+    print(f"Tentando conectar COM VALORES FIXOS: Host={db_host}, User={db_user}, DB={db_name}, Port={db_port}")
 
-    conn = pymysql.connect(
-        host=nozomi.proxy.rlwy.net, # <--- AQUI DEVE SER A VARIÁVEL, NÃO A STRING FIXA
-        user=root,
-        password=sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ,
-        database=railway,
-        port=39014,
-        cursorclass=pymysql.cursors.DictCursor
-    )
-
-# Rota para cadastrar novo TCC
-@app.route('/novo_tcc', methods=['POST'])
-def novo_tcc():
-    dados = request.json
-    campos = ['titulo', 'autor', 'curso', 'ano', 'link_arquivo']
-    if not all(campo in dados and dados[campo] for campo in campos):
-        return jsonify({'erro': 'Preencha todos os campos obrigatórios'}), 400
-
-    conn = None # Inicializa conn para garantir que esteja definido
     try:
-        conn = conectar() # Tenta conectar
-        with conn.cursor() as cursor:
-            sql = """
-                INSERT INTO tccs (titulo, autor, curso, ano, link_arquivo, id_membro_wix)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(sql, (
-                dados['titulo'],
-                dados['autor'],
-                dados['curso'],
-                dados['ano'],
-                dados['link_arquivo'],
-                dados.get('id_membro_wix')
-            ))
-            conn.commit()
-        return jsonify({'mensagem': 'TCC cadastrado com sucesso!'})
+        conn = pymysql.connect(
+            host=db_host,
+            user=db_user,
+            password=db_password,
+            database=db_name,
+            port=db_port,
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        print("Conexão com o banco de dados MySQL do Railway ESTABELECIDA COM SUCESSO usando valores fixos!")
+        return conn
     except Exception as e:
-        # Registre o erro completo para depuração, se necessário
-        # app.logger.error(f"Erro ao cadastrar TCC: {e}")
-        return jsonify({'erro': str(e)}), 500
-    finally:
-        if conn: # Garante que conn existe antes de tentar fechar
-            conn.close()
+        print(f"Erro CRÍTICO ao conectar ao banco de dados (mesmo com valores fixos): {e}")
+        raise # Re-lança a exceção para que o Flask a capture e retorne o 500
 
-# Rota para listar TCCs com filtros
-@app.route('/listar_tccs', methods=['GET'])
-def listar_tccs():
-    autor = request.args.get('autor')
-    curso = request.args.get('curso')
-    ano = request.args.get('ano')
+# ... (Restante do seu código API: rotas /novo_tcc, /listar_tccs, /excluir_tcc, etc.) ...
 
-    query = "SELECT * FROM tccs WHERE 1=1"
-    params = []
-
-    if autor:
-        query += " AND autor LIKE %s"
-        params.append(f"%{autor}%")
-    if curso:
-        query += " AND curso = %s"
-        params.append(curso)
-    if ano:
-        query += " AND ano = %s"
-        params.append(ano)
-
-    conn = None # Inicializa conn para garantir que esteja definido
-    try:
-        conn = conectar() # Tenta conectar
-        with conn.cursor() as cursor:
-            cursor.execute(query, params)
-            resultados = cursor.fetchall()
-        return jsonify(resultados)
-    except Exception as e:
-        # Registre o erro completo para depuração, se necessário
-        # app.logger.error(f"Erro ao listar TCCs: {e}")
-        return jsonify({'erro': str(e)}), 500
-    finally:
-        if conn: # Garante que conn existe antes de tentar fechar
-            conn.close()
-
-# Inicia o servidor
 if __name__ == '__main__':
-    # O Render injeta a porta via variável de ambiente PORT
-    # Use a porta fornecida pelo Render, ou 3000 como fallback para desenvolvimento local
+    # O Render usa a variável de ambiente 'PORT' para definir a porta da sua aplicação
+    # É importante manter isso lendo de os.environ.get('PORT')
     port = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=port)
