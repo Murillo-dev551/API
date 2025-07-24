@@ -8,11 +8,11 @@ CORS(app)  # Libera acesso externo (Wix, etc.)
 
 # Conexão com banco de dados
 def conectar():
-    db_host = os.environ.get('DB_HOST') # <--- ISSO DEVE PERMANECER ASSIM
-    db_user = os.environ.get('DB_USER')
-    db_password = os.environ.get('DB_PASSWORD')
-    db_name = os.environ.get('DB_NAME')
-    db_port = int(os.environ.get('DB_PORT'))
+    db_host = os.environ.get('nozomi.proxy.rlwy.net') # <--- ISSO DEVE PERMANECER ASSIM
+    db_user = os.environ.get('root')
+    db_password = os.environ.get('sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ')
+    db_name = os.environ.get('railway')
+    db_port = int(os.environ.get('39014'))
 
     # ... validações ...
 
