@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
 import pymysql.cursors
+from pymysql.cursors import DictCursor
 import os
 
 app = Flask(__name__)
@@ -76,7 +77,7 @@ def listar_tccs():
             valores.append(ano)
 
         conn = conectar()
-        with conn.cursor() as cursor:
+        with conn.cursor(DictCursor) as cursor:  # <-- AQUI ESTÁ A MUDANÇA IMPORTANTE
             cursor.execute(query, valores)
             resultado = cursor.fetchall()
         conn.close()
