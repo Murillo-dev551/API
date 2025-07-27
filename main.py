@@ -59,6 +59,7 @@ def novo_tcc():
 @app.route('/listar_tccs', methods=['GET'])
 def listar_tccs():
     try:
+        titulo = request.args.get('titulo')
         autor = request.args.get('autor')
         curso = request.args.get('curso')
         ano = request.args.get('ano')
@@ -66,6 +67,9 @@ def listar_tccs():
         query = "SELECT * FROM tccs WHERE 1=1"
         valores = []
 
+        if titulo:
+            query += " AND titulo LIKE %s"
+            valores.append(f"%{titulo}%")
         if autor:
             query += " AND autor LIKE %s"
             valores.append(f"%{autor}%")
@@ -75,18 +79,7 @@ def listar_tccs():
         if ano:
             query += " AND ano = %s"
             valores.append(ano)
-
-        conn = conectar()
-        with conn.cursor(DictCursor) as cursor:  # <-- AQUI ESTÁ A MUDANÇA IMPORTANTE
-            cursor.execute(query, valores)
-            resultado = cursor.fetchall()
-        conn.close()
-
-        return jsonify(resultado), 200
-
-    except Exception as e:
-        return jsonify({"erro": str(e)}), 500
-
+            
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
