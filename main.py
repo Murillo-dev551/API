@@ -91,7 +91,25 @@ def listar_tccs():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
-            
+@app.route('/excluir_tcc', methods=['DELETE'])
+def excluir_tcc():
+    try:
+        tcc_id = request.args.get('id')
+
+        if not tcc_id:
+            return jsonify({"erro": "ID do TCC é obrigatório"}), 400
+
+        conn = conectar()
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM tccs WHERE id = %s", (tcc_id,))
+            conn.commit()
+        conn.close()
+
+        return jsonify({"mensagem": "TCC excluído com sucesso"}), 200
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
