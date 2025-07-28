@@ -59,14 +59,38 @@ def novo_tcc():
 @app.route('/listar_tccs', methods=['GET'])
 def listar_tccs():
     try:
+        titulo = request.args.get('titulo')
+        autor = request.args.get('autor')
+        curso = request.args.get('curso')
+        ano = request.args.get('ano')
+
+        query = "SELECT * FROM tccs WHERE 1=1"
+        valores = []
+
+        if titulo:
+            query += " AND titulo LIKE %s"
+            valores.append(f"%{titulo}%")
+        if autor:
+            query += " AND autor LIKE %s"
+            valores.append(f"%{autor}%")
+        if curso:
+            query += " AND curso = %s"
+            valores.append(curso)
+        if ano:
+            query += " AND ano = %s"
+            valores.append(ano)
+
         conn = conectar()
-        with conn.cursor(DictCursor) as cursor:
-            cursor.execute("SELECT * FROM tccs ORDER BY id ASC LIMIT 1")
+        with conn.cursor() as cursor:
+            cursor.execute(query, valores)
             resultado = cursor.fetchall()
         conn.close()
+
         return jsonify(resultado), 200
+
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
+
 
 @app.route('/buscar_tcc', methods=['GET'])
 def buscar_tcc():
