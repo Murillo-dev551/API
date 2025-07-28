@@ -79,6 +79,18 @@ def listar_tccs():
         if ano:
             query += " AND ano = %s"
             valores.append(ano)
+
+        conn = conectar()
+        with conn.cursor(DictCursor) as cursor:
+            cursor.execute(query, valores)
+            resultado = cursor.fetchall()
+        conn.close()
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
             
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
