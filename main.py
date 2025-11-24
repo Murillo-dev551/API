@@ -14,7 +14,7 @@ def conectar():
     db_user = 'root'
     db_password = 'GGFxOUYfUCJYriIqeIetDKUjUUoUvKnH'
     db_name = 'railway'
-    db_port = 37810
+    db_port = 3306
 
     return pymysql.connect(
         host=db_host,
@@ -130,5 +130,6 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
