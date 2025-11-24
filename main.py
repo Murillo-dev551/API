@@ -13,7 +13,7 @@ def conectar():
     db_host = 'hopper.proxy.rlwy.net'  # Altere se necessário
     db_user = 'root'
     db_password = 'GGFxOUYfUCJYriIqeIetDKUjUUoUvKnH'
-    db_name = 'tccs'
+    db_name = 'railway'
     db_port = 37810
 
     return pymysql.connect(
@@ -130,6 +130,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
