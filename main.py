@@ -12,7 +12,7 @@ CORS(app)
 def conectar():
     db_host = 'nozomi.proxy.rlwy.net'  # Altere se necessário
     db_user = 'root'
-    db_password = 'sbxPjavPiJTbXcTgifxlgJmDUHVCFGDJ'
+    db_password = 'MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY'
     db_name = 'railway'
     db_port = 39014
 
@@ -130,6 +130,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
