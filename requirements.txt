@@ -2,4 +2,4 @@ flask
 flask-cors
 
 pymysql
-cryptography
+
