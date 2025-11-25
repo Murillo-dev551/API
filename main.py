@@ -13,12 +13,12 @@ def conectar():
     # --- LENDO VARIAVEIS DE AMBIENTE DO RAILWAY ---
     
     # 1. Host e Porta (Para proxy TCP externo, que são as variáveis do Railway)
-    db_host = os.environ.get("RAILWAY_TCP_PROXY_DOMAIN", "nozomi.proxy.rlwy.net")
-    db_port_raw = os.environ.get("RAILWAY_TCP_PROXY_PORT", 39014)
+    db_host = os.environ.get("RAILWAY_TCP_PROXY_DOMAIN", "hopper.proxy.rlwy.net")
+    db_port_raw = os.environ.get("RAILWAY_TCP_PROXY_PORT", "37810")
 
     # 2. Credenciais Dinâmicas (Geralmente injetadas pelo serviço MySQL)
     db_user = os.environ.get("MYSQLUSER", "root") 
-    db_password = os.environ.get("MYSQL_ROOT_PASSWORD", "MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY") 
+    db_password = os.environ.get("MYSQL_ROOT_PASSWORD", "GGFxOUYfUCJYriIqeIetDKUjUUoUvKnH") 
     db_name = os.environ.get("MYSQL_DATABASE", "railway") 
 
     # --- Verificações e Fallbacks (Para garantir que não haja erros de None) ---
@@ -160,6 +160,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
