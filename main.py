@@ -14,7 +14,7 @@ def conectar():
     db_user = "root"      # Lê a variável de ambiente USER (não use 'root' fixo!)
     db_password = "MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY" # Lê a variável de ambiente PASSWORD
     db_name = "railway"  # Lê a variável de ambiente DATABASE
-    db_port = "39014"
+    db_port = 39014
 
     if not db_user:
         db_user = 'root'
@@ -136,6 +136,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
