@@ -10,11 +10,11 @@ CORS(app)
 
 # Função de conexão com o banco de dados
 def conectar():
-    db_host = 'nozomi.proxy.rlwy.net'  # Altere se necessário
-    db_user = 'root'
-    db_password = 'MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY'
-    db_name = 'railway'
-    db_port = 39014
+        db_host = os.environ.get("mysql.railway.internal")      # Lê a variável de ambiente HOST
+        db_user = os.environ.get("root")      # Lê a variável de ambiente USER (não use 'root' fixo!)
+        db_password = os.environ.get("MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY") # Lê a variável de ambiente PASSWORD
+        db_name = os.environ.get("railway")  # Lê a variável de ambiente DATABASE
+        db_port = os.environ.get("3306")
 
     return pymysql.connect(
         host=db_host,
@@ -130,6 +130,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
