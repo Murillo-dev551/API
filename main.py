@@ -19,7 +19,7 @@ def conectar():
     # 2. Credenciais Dinâmicas (Geralmente injetadas pelo serviço MySQL)
     db_user = os.environ.get("MYSQLUSER") 
     db_password = os.environ.get("MYSQL_ROOT_PASSWORD") 
-    db_name = os.environ.get("MYSQL_DATABASE") 
+    db_name = os.environ.get("MYSQL_DATABASE", "railway") 
 
     # --- Verificações e Fallbacks (Para garantir que não haja erros de None) ---
     
@@ -160,6 +160,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
