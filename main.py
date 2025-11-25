@@ -10,24 +10,48 @@ CORS(app)
 
 # Função de conexão com o banco de dados
 def conectar():
-    db_host = "nozomi.proxy.rlwy.net"      # Lê a variável de ambiente HOST
-    db_user = "root"      # Lê a variável de ambiente USER (não use 'root' fixo!)
-    db_password = "MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY" # Lê a variável de ambiente PASSWORD
-    db_name = "railway"  # Lê a variável de ambiente DATABASE
-    db_port = 39014
+    # --- LENDO VARIAVEIS DE AMBIENTE DO RAILWAY ---
+    
+    # 1. Host e Porta (Para proxy TCP externo, que são as variáveis do Railway)
+    db_host = os.environ.get("RAILWAY_TCP_PROXY_DOMAIN")
+    db_port_raw = os.environ.get("RAILWAY_TCP_PROXY_PORT")
 
+    # 2. Credenciais Dinâmicas (Geralmente injetadas pelo serviço MySQL)
+    db_user = os.environ.get("MYSQLUSER") 
+    db_password = os.environ.get("MYSQL_ROOT_PASSWORD") 
+    db_name = os.environ.get("MYSQL_DATABASE") 
+
+    # --- Verificações e Fallbacks (Para garantir que não haja erros de None) ---
+    
+    if not db_host:
+        raise ValueError("Erro de Conexão: Host (RAILWAY_TCP_PROXY_DOMAIN) não encontrado.")
+    if not db_name:
+        raise ValueError("Erro de Conexão: Nome do Banco de Dados (MYSQL_DATABASE) não encontrado.")
+        
+    # Fallback para usuário (Se não houver MYSQL_USER, assume 'root')
     if not db_user:
         db_user = 'root'
+        
+    # A senha e a porta DEVEM ser injetadas. Se não forem, falha.
     if not db_password:
-        # Use o nome da variável que contém sua senha root
-        db_password = "MaVnBacdRdIKmwalHxaxQNMsBBaqzOpY"
-
+        raise ValueError("Erro de Conexão: Senha (MYSQL_PASSWORD) não encontrada. Credenciais ausentes.")
+    
+    # 3. CONVERSÃO CRÍTICA: A porta lida é uma string, deve ser INT.
+    if not db_port_raw:
+        raise ValueError("Erro de Conexão: Porta (RAILWAY_TCP_PROXY_PORT) não encontrada.")
+        
+    try:
+        db_port = int(db_port_raw)
+    except Exception:
+        raise ValueError(f"Porta inválida '{db_port_raw}'. Deve ser um número inteiro.")
+    
+    # --- Conexão ---
     return pymysql.connect(
         host=db_host,
         user=db_user,
         password=db_password,
         database=db_name,
-        port=db_port,
+        port=db_port, 
         cursorclass=pymysql.cursors.DictCursor
     )
 
@@ -136,6 +160,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
