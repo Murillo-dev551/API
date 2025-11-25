@@ -16,6 +16,12 @@ def conectar():
     db_name = os.environ.get("railway")  # Lê a variável de ambiente DATABASE
     db_port = os.environ.get("39014")
 
+    if not db_user:
+        db_user = 'root'
+    if not db_password:
+        # Use o nome da variável que contém sua senha root
+        db_password = os.environ.get("SENHA_ROOT_CUSTOMIZADA")
+
     return pymysql.connect(
         host=db_host,
         user=db_user,
@@ -130,6 +136,7 @@ def buscar_tcc():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
